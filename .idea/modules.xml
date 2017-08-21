@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/portMapping.iml" filepath="$PROJECT_DIR$/.idea/modules/portMapping.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/portMapping_main.iml" filepath="$PROJECT_DIR$/.idea/modules/portMapping_main.iml" group="portMapping" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/portMapping_test.iml" filepath="$PROJECT_DIR$/.idea/modules/portMapping_test.iml" group="portMapping" />
+    </modules>
+  </component>
+</project>

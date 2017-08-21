@@ -1,0 +1,45 @@
+group 'com.diyiliu'
+version '1.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'com.intellij', name: 'forms_rt', version: '7.0.3'
+    compile group: 'commons-net', name: 'commons-net', version: '3.6'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+// 打包jar 主函数
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.diyiliu.Main',
+        )
+    }
+
+    // '胖'打包（包含所有jar）
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+// 拷贝文件
+task copyJars(type: Copy) {
+    from configurations.runtime
+    into 'dist'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

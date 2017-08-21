@@ -23,15 +23,19 @@ jar {
     manifest {
         attributes(
                 'Main-Class': 'com.diyiliu.Main',
+                'Class-Path': 'resources/ lib/' + configurations.compile.collect {it.name}.join(' lib/')
         )
     }
 
-    // '胖'打包（包含所有jar）
-    from {
-        configurations.compile.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
+    // 过滤所有配置文件
+//    sourceSets {
+//        main {
+//            resources {
+//                exclude '*.*'
+//                exclude '**/'
+//            }
+//        }
+//    }
 }
 
 // 拷贝文件

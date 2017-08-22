@@ -60,8 +60,6 @@ public class WaitDialog extends JDialog implements Runnable {
         List<Pair> pairList = toListPair(list);
         Collections.sort(pairList);
 
-        System.out.println(pairList.size());
-
         mapperModel.refresh(toListArray(pairList));
     }
 

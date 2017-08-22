@@ -1,14 +1,18 @@
 package com.diyiliu.gui;
 
+import com.diyiliu.gui.dl.WaitDialog;
 import com.diyiliu.model.Host;
 import com.diyiliu.model.MapperModel;
 import com.diyiliu.model.Pair;
 import com.diyiliu.util.TelnetUtil;
 import com.diyiliu.util.UIHelper;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.sun.java.accessibility.util.GUIInitializedListener;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -31,13 +35,15 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
     private JButton btMapping;
     private JComboBox cbxProtocol;
     private JPanel plContainer;
+    private JButton btReload;
 
     private MapperModel mapperModel;
     private List<Pair> pairList;
 
     private TelnetUtil telnetUtil;
-
     private Properties properties;
+
+    private WaitDialog waitDialog;
 
     public MainFrame() {
         this.setContentPane(plContainer);
@@ -47,6 +53,9 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
 
         btMapping.addActionListener(this);
         btMapping.setActionCommand("toMapping");
+
+        btReload.addActionListener(this);
+        btReload.setActionCommand("toReload");
 
         this.setSize(680, 450);
         // 设置窗口居中
@@ -70,7 +79,6 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
                     StringUtils.isBlank(outIp) || StringUtils.isBlank(outPort)) {
 
                 JOptionPane.showMessageDialog(this, "IP或端口不能为空!", "提示", JOptionPane.WARNING_MESSAGE);
-                reload();
                 return;
             }
 
@@ -120,7 +128,12 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
                     }
                 }
             }
-            reload();
+        }
+
+        if ("toReload".equals(e.getActionCommand())) {
+            waitDialog = new WaitDialog(telnetUtil, mapperModel);
+            new Thread(waitDialog).start();
+            waitDialog.setVisible(true);
         }
     }
 
@@ -131,98 +144,15 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
 
         while (telnetUtil.isRunning()) {
             try {
-                Thread.sleep(3000);
-            } catch (InterruptedException exception) {
-                exception.printStackTrace();
-            }
-        }
-        reload();
-    }
-
-
-    public static void main(String[] args) {
-        UIHelper.beautify();
-        MainFrame mainFrame = new MainFrame();
-        new Thread(mainFrame).start();
-    }
-
-
-    public void reload() {
-        telnetUtil.run(": end", new String[]{"sh ru"});
-
-        while (telnetUtil.isRunning()) {
-            try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        List list = telnetUtil.getResults();
 
-        pairList = toListPair(list);
-        Collections.sort(pairList);
-        mapperModel.refresh(toListArray(pairList));
-    }
-
-
-    public boolean isMatch(String content) {
-        String regex = "^static \\(inside,outside\\) [tcp|udp][\\s\\S]*?";
-
-        return Pattern.matches(regex, content);
-    }
-
-    public Pair dataFormat(String content) {
-        String[] array = content.split(" ");
-        if (array.length < 7) {
-            return null;
-        }
-
-        String protocol = array[2];
-        Host inside = new Host(array[5], array[6]);
-        Host outside = new Host(array[3], array[4]);
-
-        Pair p = new Pair();
-        p.setProtocol(protocol);
-        p.setInside(inside);
-        p.setOutside(outside);
-
-        return p;
-    }
-
-    /**
-     * String集合转Pair集合
-     *
-     * @param l
-     * @return
-     */
-    public List<Pair> toListPair(List<String> l) {
-        List list = new ArrayList();
-        for (int i = 0; i < l.size(); i++) {
-            String content = l.get(i);
-            if (isMatch(content)) {
-                Pair p = dataFormat(content);
-                list.add(p);
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * 把Pair对象数组，转为Array对象数组
-     *
-     * @param l
-     * @return
-     */
-    public List toListArray(List<Pair> l) {
-
-        List list = new ArrayList();
-        for (int i = 0; i < l.size(); i++) {
-            Pair p = l.get(i);
-            list.add(p.toArray(i + 1));
-        }
-
-        return list;
+        waitDialog = new WaitDialog(telnetUtil, mapperModel);
+        new Thread(waitDialog).start();
+        waitDialog.setVisible(true);
     }
 
     public boolean toDoMapping(Pair p, List<Pair> list) {
@@ -245,6 +175,12 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
         return true;
     }
 
+    public static void main(String[] args) {
+        UIHelper.beautify();
+        MainFrame mainFrame = new MainFrame();
+        new Thread(mainFrame).start();
+    }
+
     public Properties getProperties() {
         return properties;
     }
@@ -252,4 +188,5 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
     public void setProperties(Properties properties) {
         this.properties = properties;
     }
+
 }

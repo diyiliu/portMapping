@@ -2,6 +2,7 @@ group 'com.diyiliu'
 version '1.0'
 
 apply plugin: 'java'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.8
 
@@ -23,7 +24,7 @@ jar {
     manifest {
         attributes(
                 'Main-Class': 'com.diyiliu.Main',
-                'Class-Path': 'resources/ lib/' + configurations.compile.collect {it.name}.join(' lib/')
+                'Class-Path': 'resources/ lib/' + configurations.compile.collect { it.name }.join(' lib/')
         )
     }
 
@@ -36,6 +37,13 @@ jar {
 //            }
 //        }
 //    }
+
+    // '胖'打包（包含所有jar）
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
 
 // 拷贝文件

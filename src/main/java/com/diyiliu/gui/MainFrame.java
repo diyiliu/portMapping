@@ -38,7 +38,6 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
     private JButton btReload;
 
     private MapperModel mapperModel;
-    private List<Pair> pairList;
 
     private TelnetUtil telnetUtil;
     private Properties properties;
@@ -82,7 +81,6 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
                 return;
             }
 
-
             String protocol = cbxProtocol.getSelectedItem().toString();
 
             Host inHost = new Host(inIp, inPort);
@@ -93,7 +91,7 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
             pair.setInside(inHost);
             pair.setOutside(outHost);
 
-            if (toDoMapping(pair, pairList)) {
+            if (toDoMapping(pair, mapperModel.getPairs())) {
                 telnetUtil.run("(config)#", new String[]{"int e0/0", pair.toString()});
                 while (telnetUtil.isRunning()) {
                     try {

@@ -12,6 +12,8 @@ import java.util.List;
 public class MapperModel extends AbstractTableModel {
 
     private final String[] columnNames = new String[]{"序号", "协议", "内网地址", "内网端口", "外网地址", "外网端口"};
+
+    private List<Pair> pairs;
     private List data = new ArrayList();
 
     public MapperModel() {
@@ -45,13 +47,35 @@ public class MapperModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
-    public void refresh(List list) {
-        data = list;
+    public void refresh(List<Pair> list) {
+        pairs = list;
+        data = toListArray(pairs);
         this.fireTableDataChanged();
     }
 
     public Object[] getRowData(int rowIndex) {
 
         return (Object[]) data.get(rowIndex);
+    }
+
+    public List<Pair> getPairs() {
+        return pairs;
+    }
+
+    /**
+     * 把Pair对象数组，转为Array对象数组
+     *
+     * @param l
+     * @return
+     */
+    public List toListArray(List<Pair> l) {
+
+        List list = new ArrayList();
+        for (int i = 0; i < l.size(); i++) {
+            Pair p = l.get(i);
+            list.add(p.toArray(i + 1));
+        }
+
+        return list;
     }
 }

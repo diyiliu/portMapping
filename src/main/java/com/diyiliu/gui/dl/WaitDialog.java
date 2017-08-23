@@ -60,7 +60,7 @@ public class WaitDialog extends JDialog implements Runnable {
         List<Pair> pairList = toListPair(list);
         Collections.sort(pairList);
 
-        mapperModel.refresh(toListArray(pairList));
+        mapperModel.refresh(pairList);
     }
 
     public boolean isMatch(String content) {
@@ -101,23 +101,6 @@ public class WaitDialog extends JDialog implements Runnable {
                 Pair p = dataFormat(content);
                 list.add(p);
             }
-        }
-
-        return list;
-    }
-
-    /**
-     * 把Pair对象数组，转为Array对象数组
-     *
-     * @param l
-     * @return
-     */
-    public List toListArray(List<Pair> l) {
-
-        List list = new ArrayList();
-        for (int i = 0; i < l.size(); i++) {
-            Pair p = l.get(i);
-            list.add(p.toArray(i + 1));
         }
 
         return list;

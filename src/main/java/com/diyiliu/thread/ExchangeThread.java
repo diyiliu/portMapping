@@ -12,7 +12,7 @@ import java.util.*;
 public class ExchangeThread implements Runnable {
 
     private OutputStream os;
-    private String[] inputValues;
+    private String input;
     private Queue queue;
     private String endFlag;
 
@@ -20,9 +20,9 @@ public class ExchangeThread implements Runnable {
         this.os = os;
     }
 
-    public ExchangeThread(OutputStream os, String[] inputValues, Queue queue, String endFlag) {
+    public ExchangeThread(OutputStream os, String input, Queue queue, String endFlag) {
         this.os = os;
-        this.inputValues = inputValues;
+        this.input = input;
         this.queue = queue;
         this.endFlag = endFlag;
     }
@@ -37,32 +37,37 @@ public class ExchangeThread implements Runnable {
         live = true;
 
         LinkedList<String> inputList = new LinkedList();
-        inputList.addAll(Arrays.asList(inputValues));
+        inputList.add(input);
 
+        String input = "";
+        String content = "";
         while (true) {
-            String content = "";
             if (!queue.isEmpty()) {
                 content = (String) queue.poll();
                 results.add(content);
 
-                //System.out.println(content);
+                System.out.println(content);
             } else {
-                write(" ", os);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if (!inputList.isEmpty()){
-                    write(inputList.poll(), os);
+                if (inputList.isEmpty()){
+                    write(" ", os);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    input = inputList.poll();
+                    System.out.println("输入:" + input);
+                    write(input, os);
                 }
             }
 
             if (inputList.isEmpty() && content.contains(endFlag)) {
-                System.out.println("输入完成!");
-                live = false;
-                break;
+                if (!content.contains(input)){
+                    System.out.println("输入完成!");
+                    live = false;
+                    break;
+                }
             }
         }
     }
@@ -71,8 +76,8 @@ public class ExchangeThread implements Runnable {
         this.live = live;
     }
 
-    public void setInputValues(String[] inputValues) {
-        this.inputValues = inputValues;
+    public void setInputValue(String input) {
+        this.input = input;
     }
 
     public void setQueue(Queue queue) {
@@ -91,7 +96,7 @@ public class ExchangeThread implements Runnable {
      */
     public void write(String cmd, OutputStream os) {
         try {
-            cmd = cmd + "\n";
+            cmd += "\n";
             os.write(cmd.getBytes());
             os.flush();
         } catch (IOException e) {

@@ -31,7 +31,7 @@ public class TelnetUtil {
     public void init(){
         try {
             TelnetClient client = new TelnetClient();
-            client.connect("192.168.1.1", 23);
+            client.connect(host, port);
             InputStream in = client.getInputStream();
             OutputStream os = client.getOutputStream();
 
@@ -44,10 +44,10 @@ public class TelnetUtil {
         }
     }
 
-    public void run(String endFlag, String... values){
+    public void run(String endFlag, String value){
         exchangeThread.setQueue(backMsgThread.getBackMsg());
         exchangeThread.setEndFlag(endFlag);
-        exchangeThread.setInputValues(values);
+        exchangeThread.setInputValue(value);
 
         new Thread(exchangeThread).start();
         exchangeThread.setLive(true);

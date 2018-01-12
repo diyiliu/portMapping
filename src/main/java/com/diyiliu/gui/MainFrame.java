@@ -92,14 +92,8 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
             pair.setOutside(outHost);
 
             if (toDoMapping(pair, mapperModel.getPairs())) {
-                telnetUtil.run("(config)#", new String[]{"int e0/0", pair.toString()});
-                while (telnetUtil.isRunning()) {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException exception) {
-                        exception.printStackTrace();
-                    }
-                }
+                doRunning("#", "int e0/0");
+                doRunning("#",  pair.toString());
                 List<String> list = telnetUtil.getResults();
                 for (String rs : list) {
                     if (rs.contains("ERROR:")) {
@@ -109,14 +103,7 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
                     }
                 }
 
-                telnetUtil.run("[OK]", new String[]{"wr", pair.toString()});
-                while (telnetUtil.isRunning()) {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException exception) {
-                        exception.printStackTrace();
-                    }
-                }
+                doRunning("#", "wr");
                 list = telnetUtil.getResults();
                 for (String rs : list) {
                     if (rs.contains("OK")) {
@@ -138,15 +125,11 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
     @Override
     public void run() {
         telnetUtil = new TelnetUtil((String) properties.get("host"), Integer.parseInt((String) properties.get("port")));
-        telnetUtil.run("#", new String[]{(String) properties.get("pw"), "en", (String) properties.get("pw.en"), "conf t"});
 
-        while (telnetUtil.isRunning()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        doRunning(">", (String) properties.get("pw"));
+        doRunning("Password", "en");
+        doRunning("#", (String) properties.get("pw.en"));
+        doRunning("#", "conf t");
 
         waitDialog = new WaitDialog(telnetUtil, mapperModel);
         new Thread(waitDialog).start();
@@ -171,6 +154,17 @@ public class MainFrame extends JFrame implements ActionListener, Runnable {
         }
 
         return true;
+    }
+
+    public void doRunning(String endFlag, String input){
+        telnetUtil.run(endFlag, input);
+        while (telnetUtil.isRunning()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void main(String[] args) {

@@ -40,7 +40,7 @@ public class WaitDialog extends JDialog implements Runnable {
         drawThread = new DrawThread(drawPanel, lbWait);
         new Thread(drawThread).start();
 
-        telnetUtil.run(": end", new String[]{"sh ru"});
+        telnetUtil.run("#","sh ru");
 
         while (true) {
             try {
